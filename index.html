@@ -38,7 +38,31 @@
             text-transform: uppercase; 
         }
         
-        #month-name { font-size: 1.8em; font-weight: bold; margin: 20px 0 10px 0; text-transform: uppercase; }
+        /* Month Section Container */
+        .month-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            width: 100%;
+            margin: 20px 0 10px 0;
+            position: relative;
+        }
+
+        #timezone-display {
+            font-size: 0.6em;
+            color: gray;
+            position: absolute;
+            left: 0;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        #month-name { 
+            font-size: 1.8em; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            margin: 0;
+        }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
@@ -57,12 +81,11 @@
             padding: 15px 0; 
             font-size: 1.6em; 
             font-weight: bold; 
-            color: black; /* Ensuring all text is solid black */
+            color: black; 
         }
 
-        /* Sunday Column Style */
         .sun-col { 
-            background-color: #e8e8e8; /* Reverted background gray */
+            background-color: #e8e8e8; 
         }
 
         .today { background-color: black !important; color: white !important; }
@@ -85,7 +108,11 @@
             </div>
         </div>
 
-        <div id="month-name">MONTH</div>
+        <div class="month-container">
+            <div id="timezone-display">--</div>
+            <div id="month-name">MONTH</div>
+        </div>
+
         <table id="calendar">
             <thead>
                 <tr>
@@ -98,19 +125,24 @@
     </div>
 
     <script>
-        const timeZone = 'Asia/Kolkata';
+        const params = new URLSearchParams(window.location.search);
+        const city = params.get('city') || 'Bengaluru';
+        const timeZone = params.get('tz') || 'Asia/Kolkata';
+
+        // Set timezone text immediately
+        document.getElementById('timezone-display').textContent = timeZone;
 
         function updateWeather() {
-            fetch(`https://wttr.in/Bengaluru?format=j1`)
+            fetch(`https://wttr.in/${city}?format=j1`)
                 .then(res => res.json())
                 .then(data => {
                     const current = data.current_condition[0];
                     const temp = current.temp_C;
                     const desc = current.weatherDesc[0].value;
-                    document.getElementById('weather-box').innerHTML = `BENGALURU<br>${temp}&deg;C  ${desc}`;
+                    document.getElementById('weather-box').innerHTML = `${city.toUpperCase()}<br>${temp}&deg;C  ${desc}`;
                 })
                 .catch(() => { 
-                    document.getElementById('weather-box').innerHTML = "BENGALURU<br>OFFLINE"; 
+                    document.getElementById('weather-box').innerHTML = `${city.toUpperCase()}<br>OFFLINE`; 
                 });
         }
 
@@ -128,7 +160,10 @@
             const todayDate = parseInt(istDate.find(p => p.type === 'day').value);
             
             document.getElementById('month-name').textContent = now.toLocaleDateString('en-IN', { timeZone, month: 'long', year: 'numeric' });
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            
+            const firstDayStr = new Date(currentYear, currentMonth, 1).toLocaleString("en-US", {timeZone: timeZone});
+            const firstDay = new Date(firstDayStr).getDay();
+            
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const tableBody = document.getElementById('calendar-body');
             tableBody.innerHTML = ""; 
