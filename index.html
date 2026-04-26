@@ -38,7 +38,6 @@
             text-transform: uppercase; 
         }
         
-        /* Month Section Container */
         .month-container {
             display: flex;
             align-items: baseline;
@@ -48,12 +47,26 @@
             position: relative;
         }
 
-        #timezone-display {
-            font-size: 0.6em;
-            color: gray;
+        .info-stack {
             position: absolute;
             left: 0;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #timezone-display {
+            font-size: 0.65em;
+            color: gray;
             text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .github-link {
+            font-size: 0.65em;
+            color: gray;
+            text-decoration: underline;
+            margin-top: 1px;
             font-weight: bold;
         }
 
@@ -65,29 +78,9 @@
         }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        
-        th { 
-            border: 3px solid black;
-            background-color: black; 
-            color: white; 
-            text-transform: uppercase; 
-            font-size: 1.1em; 
-            padding: 10px 0;
-        }
-
-        td { 
-            border: 3px solid black; 
-            text-align: center; 
-            padding: 15px 0; 
-            font-size: 1.6em; 
-            font-weight: bold; 
-            color: black; 
-        }
-
-        .sun-col { 
-            background-color: #e8e8e8; 
-        }
-
+        th { border: 3px solid black; background-color: black; color: white; text-transform: uppercase; font-size: 1.1em; padding: 10px 0; }
+        td { border: 3px solid black; text-align: center; padding: 15px 0; font-size: 1.6em; font-weight: bold; color: black; }
+        .sun-col { background-color: #e8e8e8; }
         .today { background-color: black !important; color: white !important; }
     </style>
 </head>
@@ -109,7 +102,10 @@
         </div>
 
         <div class="month-container">
-            <div id="timezone-display">--</div>
+            <div class="info-stack">
+                <div id="timezone-display">--</div>
+                <a href="https://github.com/sandeepkrs/desk-clock-simple" class="github-link">GITHUB</a>
+            </div>
             <div id="month-name">MONTH</div>
         </div>
 
@@ -129,7 +125,6 @@
         const city = params.get('city') || 'Bengaluru';
         const timeZone = params.get('tz') || 'Asia/Kolkata';
 
-        // Set timezone text immediately
         document.getElementById('timezone-display').textContent = timeZone;
 
         function updateWeather() {
@@ -137,13 +132,9 @@
                 .then(res => res.json())
                 .then(data => {
                     const current = data.current_condition[0];
-                    const temp = current.temp_C;
-                    const desc = current.weatherDesc[0].value;
-                    document.getElementById('weather-box').innerHTML = `${city.toUpperCase()}<br>${temp}&deg;C  ${desc}`;
+                    document.getElementById('weather-box').innerHTML = `${city.toUpperCase()}<br>${current.temp_C}&deg;C  ${current.weatherDesc[0].value}`;
                 })
-                .catch(() => { 
-                    document.getElementById('weather-box').innerHTML = `${city.toUpperCase()}<br>OFFLINE`; 
-                });
+                .catch(() => { document.getElementById('weather-box').innerHTML = `${city.toUpperCase()}<br>OFFLINE`; });
         }
 
         function updateDisplay() {
@@ -163,7 +154,6 @@
             
             const firstDayStr = new Date(currentYear, currentMonth, 1).toLocaleString("en-US", {timeZone: timeZone});
             const firstDay = new Date(firstDayStr).getDay();
-            
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const tableBody = document.getElementById('calendar-body');
             tableBody.innerHTML = ""; 
